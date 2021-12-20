@@ -1,21 +1,18 @@
 # PercentVisibleLayout
 
-PercentVisibleLayout is a layout (extends RelativeLayout) with a custom listener which gives the visibility percentage of the layout every time it is changed.Pixel visibility listener is also available.
+PercentVisibleLayout is a layout (extends ScrollView) that can be used to calculate the visibility in percentage and pixel. A scroll listener can be added in the parent custom view that will be invoked whenever scroll happen. Based on that the visibility percentage of the children custom layout can be updated every time. And a custom callback method is there to listen if any changes happen. Pixel visibility listener is also available.
 
 ### Currently supporting
-- Use **ONLY** inside Listviews,RecyclerViews,ScrollViews,Viewpager etc.
+- Use **ONLY** inside PercentVisibleLayout.
 - Percentage Listener with visible height/width percentage and flags for which part is missing
 - Pixels Listener with visible height/width pixels and flags for which part is missing
 
 
 
-
-### Demo
-
-[![](https://pinalbookclub.files.wordpress.com/2013/12/google-play-icon-small.png?w=593)](https://play.google.com/store/apps/details?id=demo.percentvisiblelayout.tzanou.gr.percentvisiblelayoutdemo)
+![picture](/images/vertical.png)
+![picture](/images/horizontal.png)
 
 
-![alt text](http://i268.photobucket.com/albums/jj26/tzanou/simple_zpskny3oz8q.gif ) ![alt text](http://i268.photobucket.com/albums/jj26/tzanou/complex_zpsdvhsxfkn.gif ) ![alt text](http://i268.photobucket.com/albums/jj26/tzanou/horizontal_zpsen0debme.gif )
 
 ### Usage
 
@@ -24,59 +21,83 @@ PercentVisibleLayout is a layout (extends RelativeLayout) with a custom listener
 #### In your xml file
 
 ```xml
-   <com.tzanou.PercentVisibleLayout.PercentVisibleLayout
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center"
-        android:id="@+id/custom_layout">
-        
-        <TextView
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/percentage_text"/>
-            
-    </com.tzanou.PercentVisibleLayout.PercentVisibleLayout>
+  <?xml version="1.0" encoding="utf-8"?>
+  <DirectionalLayout
+      xmlns:ohos="http://schemas.huawei.com/res/ohos"
+      ohos:height="match_parent"
+      ohos:width="match_parent"
+      ohos:alignment="center">
+  
+      <com.example.percentvisiblelayout.PercentVisibleLayout
+          ohos:id="$+id:customview"
+          ohos:height="match_parent"
+          ohos:width="match_parent">
+  
+      </com.example.percentvisiblelayout.PercentVisibleLayout>
+  </DirectionalLayout>
 ```
 #### In your activity
 
 ```java
 
-    mCustomLayout=(PercentVisibleLayout) findViewById(R.id.custom_layout);
+           PercentVisibleLayout customView = (PercentVisibleLayout) findComponentById(ResourceTable.Id_customview);
+   
+   
+           DirectionalLayout linearlayout = new DirectionalLayout(getApplicationContext());
+           linearlayout.setOrientation(Component.VERTICAL);
+           linearlayout.setAlignment(LayoutAlignment.HORIZONTAL_CENTER);
+           customView.addComponent(linearlayout, new ComponentContainer.LayoutConfig(
+                   ComponentContainer.LayoutConfig.MATCH_PARENT, ComponentContainer.LayoutConfig.MATCH_CONTENT));
+   
+           PercentVisibleLayout customView1 = new PercentVisibleLayout(this, null);
+           ShapeElement red = new ShapeElement();
+           red.setRgbColor(RgbColor.fromArgbInt(Color.RED.getValue()));
+           customView1.setBackground(red);
+           customView1.setMarginTop(300);
+           linearlayout.addComponent(customView1, new ComponentContainer.LayoutConfig(1000, 1000));
+   
+           Text textview1 = new Text(getApplicationContext());
+           textview1.setTextAlignment(TextAlignment.CENTER);
+           textview1.setTextColor(Color.WHITE);
+           textview1.setTextSize(75);
+           customView1.addComponent(textview1, new ComponentContainer.LayoutConfig(
+                   ComponentContainer.LayoutConfig.MATCH_PARENT, ComponentContainer.LayoutConfig.MATCH_PARENT));
 
-    mCustomLayout.setOnVisibilityPercentChangedListener(new PercentVisibleLayout.OnVisibilityPercentChanged() {
-            @Override
-            public void onVisibilityChange(int fromHeight, int fromWidth, int percentageHeight, int percentageWidth) {
-                holder.mText.setText( percentageHeight+"%" );
-            }
-        });
+
+           customView.getComponentTreeObserver().addScrolledListener(() -> {
+               customView1.calculateVisibility();
+           });
+           
+           customView1.setOnVisibilityPercentChangedListener((fromHeight, fromWidth, percentageHeight, percentageWidth) ->
+               textview1.setText(percentageHeight + "%")
+           );
 ```
 
-## More examples and methods on [Wiki Page](https://github.com/tzanou/VisibilityPercentageLayout/wiki)
 
-##Download
+### Source
 
-```
-dependencies {
-compile 'com.tzanou:PercentVisibleLayout:1.1.2@aar'
-}
-```
-
-or Downwnload [PercentVisibleLayout.java](https://github.com/tzanou/PercentVisibleLayout/blob/master/Library/java/com/tzanou/PercentVisibleLayout/PercentVisibleLayout.java)
+---
+This library has been inspired by [tzanou/PercentVisibleLayout](https://github.com/tzanou/PercentVisibleLayout)
 
 
-##Licensing
 
-Copyright 2015 George Tzanoudakis
+### Integration
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+---
 
-   http://www.apache.org/licenses/LICENSE-2.0
+**From Source**
+1. For using PercentVisibleLayout module in sample app, include the source code and add the below dependencies in entry/build.gradle to generate hap/support.har.
+    ```groovy
+    implementation project(path: ':percentvisiblelayout')
+    ```
+2. For using PercentVisibleLayout module in separate application using har file, add the har file in the entry/libs folder and add the dependencies in entry/build.gradle file.
+    ```groovy
+   implementation fileTree(dir: 'libs', include: ['*.har'])
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
+   
+   
+### License
+
+TitleLayout is released under the [Apache License Version 2.0](LICENSE).
+
