@@ -9,8 +9,8 @@ PercentVisibleLayout is a layout (extends ScrollView) that can be used to calcul
 
 
 
-![picture](/images/vertical.png)
-![picture](/images/horizontal.png)
+![picture](/images/tab_vertical.gif)
+![picture](/images/tab_horizontal.gif)
 
 
 
